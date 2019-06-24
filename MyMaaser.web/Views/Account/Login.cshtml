@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-3 well">
+        <h2>Login</h2>
+        <form method="post" action="/account/login">
+            <input type="text" class="form-control" name="username" placeholder="Username" />
+            <br />
+            <input type="password" class="form-control" name="password" placeholder="Password" />
+            <br />
+            <button class="btn btn-warning">Login</button>
+        </form>
+        <br />
+        <br />
+        <a href="/account/signup">If you haven't signed up yet click here to do so</a>
+    </div>
+</div>
+

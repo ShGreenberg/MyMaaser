@@ -1,0 +1,118 @@
+﻿@using MyMaaser.web.Models
+@model IndexViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<div class="row">
+    <div class="col-md-5 col-md-offset-3 well">
+        <span id="total-num-given"></span>
+        <div class="col-md-4 col-md-offset-1">
+            <button class="btn btn-primary" data-target="#add-money-modal" data-toggle="modal">Add Money</button>
+        </div>
+        @*<div class="col-md-4 col-md-offset-1">
+                <button class="btn btn-success" data-target="#give-maaser-modal" data-toggle="modal">Give Maaser</button>
+            </div>*@
+    </div>
+</div>
+
+<div class="container">
+    <h3 class="col-md-10 " id="owe">still need to give maaser from @Model.TotalOwe.ToString("C") - which means giving @((Model.TotalOwe / 10).ToString("C"))</h3>
+    <table class="table table-bordered table-striped" id="maaser-table">
+        <tr>
+            <th>Amount</th>
+            <th>From</th>
+            <th>Date</th>
+            <th>Paid up</th>
+        </tr>
+        @foreach (var m in Model.MoneyEarned)
+        {
+            <tr>
+                <td>@m.Amount.ToString("C")</td>
+                <td>@m.RecievedFrom</td>
+                <td>@m.Date.ToShortDateString()</td>
+                <td>@m.PaidUp</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<div id="add-money-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Money</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <input type="text" class="form-control" id="amount" placeholder="Amount" />
+                    <br />
+                    <input type="text" class="form-control" id="from" placeholder="From" />
+                    <br />
+                    <input type="date" id="date" />
+                    <br />
+                    <br />
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info" id="btn-addmoney-modal">Add</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+@section scripts{
+    <script src="~/js/index.js"></script>
+}
+
+
+
+@*<div class="col-md-8 col-md-offset-3 well">
+        <input type="text" class="form-control" id="amount" placeholder="Amount" />
+        <br />
+        <input type="text" class="form-control" id="from" placeholder="From" />
+        <br />
+        <input type="date" id="date" />
+        <br />
+        <br />
+
+        <button class="btn btn-info" id="add-money">Add</button>
+    </div>*@
+
+    @*/*<div id="give-maaser-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">*@
+
+            <!-- Modal content-->
+            @*<div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>*@
+                @*<div class="modal-body">
+                    <p>
+                        <input type="text" class="form-control" id="mg-amount" placeholder="Amount" />
+                        <br />
+                        <input type="text" class="form-control" id="mg-toWhere" placeholder="To Where" />
+                        <br />
+                        <input type="date" id="mg-date" />
+                        <br /><br />
+                    </p>*@
+                @*</div>
+                <div class="modal-footer">
+                    <button class="btn btn-info" id="btn-givemaaser-modal">Add Give</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>*/*@
