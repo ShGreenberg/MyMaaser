@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+
 
 namespace MyMaaser.data
 {
@@ -35,10 +37,17 @@ namespace MyMaaser.data
                 maaserGiven.UserId = _user.Id;
                 ctx.MaaserGiven.Add(maaserGiven);
                 ctx.SaveChanges();
-                maaserGiven.GiveToMoney = AddGiveToMoney(maaserGiven).Select(i => new GiveToMoney
-                { MaaserGivenId = maaserGiven.Id, UserId = _user.Id, MoneyId = i }).ToList();
-                ctx.MaaserGiven.Attach(maaserGiven);
-                ctx.Entry(maaserGiven).State = EntityState.Modified;
+                var money = AddGiveToMoney(maaserGiven);
+                if(money.Count > 1)
+                {
+                    maaserGiven.GiveToMoney = money.Select(i => new GiveToMoney
+                    { MaaserGivenId = maaserGiven.Id, UserId = _user.Id, MoneyId = i }).ToList();
+                    ctx.MaaserGiven.Attach(maaserGiven);
+                    ctx.Entry(maaserGiven).State = EntityState.Modified;
+                }
+               
+
+
                 ctx.SaveChanges();
             }
         }
@@ -56,43 +65,43 @@ namespace MyMaaser.data
             List<int> moneyIds = new List<int>();
             using (var ctx = new MaaserContext(_connString))
             {
-                IEnumerable<MoneyEarned> money = ctx.MoneyEarned;
+                IEnumerable<MoneyEarned> money = ctx.MoneyEarned.Where(z => z.UserId == _user.Id);
                 MoneyEarned m = money.FirstOrDefault(mo => mo.PaidUp == false);
                 decimal amount = maaserGiven.Amount * 10;
-                if(m == null)
+                if (m == null)
                 {
                     return null;
                 }
 
                 while (m.PaidUp == false && amount != 0 && m.AmountLeft != 0)
                 {
-                  
-                        m.AmountLeft = m.AmountLeft - amount;
-                        moneyIds.Add(m.Id);
-                        if (m.AmountLeft < 0)
+
+                    m.AmountLeft = m.AmountLeft - amount;
+                    moneyIds.Add(m.Id);
+                    if (m.AmountLeft < 0)
+                    {
+                        amount = 0 - m.AmountLeft;
+                        m.AmountLeft = 0;
+                        m.PaidUp = true;
+                        ctx.MoneyEarned.Attach(m);
+                        ctx.Entry(m).State = EntityState.Modified;
+                        m = money.FirstOrDefault(mo => mo.PaidUp == false);
+                        if (m == null)
                         {
-                            amount = 0 - m.AmountLeft;
-                            m.AmountLeft = 0;
-                            m.PaidUp = true;
-                            ctx.MoneyEarned.Attach(m);
-                            ctx.Entry(m).State = EntityState.Modified;
-                            m = money.FirstOrDefault(mo => mo.PaidUp == false);
-                            if (m == null)
-                            {
-                                break;
-                            }
-                        }
-                        else if (m.AmountLeft == 0)
-                        {
-                            m.PaidUp = true;
-                            ctx.MoneyEarned.Attach(m);
-                            ctx.Entry(m).State = EntityState.Modified;
-                        }
-                        else
-                        {
-                            ctx.SaveChanges();
                             break;
                         }
+                    }
+                    else if (m.AmountLeft == 0)
+                    {
+                        m.PaidUp = true;
+                        ctx.MoneyEarned.Attach(m);
+                        ctx.Entry(m).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        ctx.SaveChanges();
+                        break;
+                    }
                     ctx.SaveChanges();
                 }
 
@@ -102,7 +111,7 @@ namespace MyMaaser.data
 
         public List<MoneyEarned> GetMoneyEarned()
         {
-            using(var ctx = new MaaserContext(_connString))
+            using (var ctx = new MaaserContext(_connString))
             {
                 return ctx.MoneyEarned.Where(m => m.UserId == _user.Id).ToList();
             }
@@ -118,7 +127,7 @@ namespace MyMaaser.data
 
         public decimal GetTotalEarned()
         {
-            using(var ctx = new MaaserContext(_connString))
+            using (var ctx = new MaaserContext(_connString))
             {
                 var total = ctx.MoneyEarned.Where(m => m.UserId == _user.Id).Sum(m => m.Amount);
                 return total;
@@ -135,12 +144,12 @@ namespace MyMaaser.data
 
         public decimal GetStillOwe()
         {
-            return GetTotalEarned() - GetTotalMaaserGiven()*10;
+            return GetTotalEarned() - GetTotalMaaserGiven() * 10;
         }
 
         private User GetUser(string username)
         {
-            using(var ctx = new MaaserContext(_connString))
+            using (var ctx = new MaaserContext(_connString))
             {
                 return ctx.Users.FirstOrDefault(u => u.UserName == username);
             }

@@ -25,7 +25,7 @@
             <th>Amount</th>
             <th>From</th>
             <th>Date</th>
-            @*<th>Paid up</th>*@
+            <th>Paid up</th>
         </tr>
         @foreach (var m in Model.MoneyEarned)
         {
@@ -33,7 +33,7 @@
                 <td>@m.Amount.ToString("C")</td>
                 <td>@m.RecievedFrom</td>
                 <td>@m.Date.ToShortDateString()</td>
-                @*<td>@m.PaidUp</td>*@
+                <td>@m.PaidUp</td>
             </tr>
         }
     </table>
