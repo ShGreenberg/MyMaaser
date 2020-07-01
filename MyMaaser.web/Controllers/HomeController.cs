@@ -36,6 +36,10 @@ namespace MyMaaser.web.Controllers
         [HttpPost]
         public IActionResult AddMoney(MoneyEarned money)
         {
+            if(money.Amount < 0)
+            {
+                return Json(new { money = "error" });
+            }
             MaaserRepository rep = new MaaserRepository(_connString, User.Identity.Name);
             rep.AddAmount(money);
             var total = rep.GetStillOwe();

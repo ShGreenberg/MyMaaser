@@ -7,9 +7,18 @@
             date: $("#date").val()
         }
         $.post("/home/addmoney", money, function ({ money, total }) {
+            $("#for-errors").empty();
+            $("#amount").val("");
+            $("#from").val("");
+            $("#date").val("");45
             $("#add-money-modal").modal("toggle");
             const day = new Date(money.date);
             const date = day.getMonth() + 1 + "/" + day.getDate() + "/" + day.getFullYear();
+            if (money === "error") {
+                $("#for-errors").append('<span style="color: red">Error- entered something incorrectly</span>')
+                return;
+            }
+            
 
             $("#maaser-table").append(`<tr>
                 <td>$${money.amount.toFixed(2)}</td>
